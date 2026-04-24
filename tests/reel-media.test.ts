@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { resolveReelMedia } from "../src/lib/reel-media.ts";
+import { resolveReelMedia, withBunnyAutoplayParams } from "../src/lib/reel-media.ts";
 import { env } from "../src/lib/env.ts";
 import type { FeedItem } from "../src/types/feed-item.ts";
 
@@ -50,7 +50,7 @@ test("reel media builds a Bunny embed URL from video ID when the library ID exis
 
   assert.deepEqual(media, {
     kind: "embed",
-    src: "https://iframe.mediadelivery.net/embed/library-123/video-456",
+    src: "https://iframe.mediadelivery.net/embed/library-123/video-456?autoplay=true&muted=true&playsinline=true&loop=true",
   });
 });
 
@@ -78,4 +78,17 @@ test("reel media uses a placeholder when video and thumbnail are missing", () =>
   assert.deepEqual(media, {
     kind: "placeholder",
   });
+});
+
+test("Bunny autoplay params keep explicit embed URLs playable and mobile-friendly", () => {
+  const src = withBunnyAutoplayParams("https://iframe.mediadelivery.net/embed/custom/video-1?preload=true");
+
+  assert.equal(
+    src,
+    "https://iframe.mediadelivery.net/embed/custom/video-1?preload=true&autoplay=true&muted=true&playsinline=true&loop=true",
+  );
+});
+
+test("Bunny autoplay params leave invalid URLs untouched", () => {
+  assert.equal(withBunnyAutoplayParams("not a url"), "not a url");
 });

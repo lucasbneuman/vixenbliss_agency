@@ -129,5 +129,8 @@ test("Bunny embed helper builds the public embed URL when the library ID is pres
 
   const embedUrl = getBunnyEmbedUrl("video-456");
 
-  assert.equal(embedUrl, "https://iframe.mediadelivery.net/embed/library-123/video-456");
+  assert.equal(
+    embedUrl,
+    "https://iframe.mediadelivery.net/embed/library-123/video-456?autoplay=true&muted=true&playsinline=true&loop=true",
+  );
 });

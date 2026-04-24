@@ -11,5 +11,11 @@ export function getBunnyEmbedUrl(videoId: string): string {
     throw new Error("[bunny] videoId is required to build the public embed URL.");
   }
 
-  return `https://iframe.mediadelivery.net/embed/${env.BUNNY_LIBRARY_ID}/${sanitizedVideoId}`;
+  const embedUrl = new URL(`https://iframe.mediadelivery.net/embed/${env.BUNNY_LIBRARY_ID}/${sanitizedVideoId}`);
+  embedUrl.searchParams.set("autoplay", "true");
+  embedUrl.searchParams.set("muted", "true");
+  embedUrl.searchParams.set("playsinline", "true");
+  embedUrl.searchParams.set("loop", "true");
+
+  return embedUrl.toString();
 }

@@ -59,6 +59,7 @@ export function withBunnyAutoplayParams(src: string): string {
     url.searchParams.set("autoplay", "true");
     url.searchParams.set("muted", "true");
     url.searchParams.set("playsinline", "true");
+    url.searchParams.set("loop", "true");
 
     return url.toString();
   } catch {
