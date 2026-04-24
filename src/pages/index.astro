@@ -1,4 +1,7 @@
 ---
+import AboutSection from "../components/AboutSection.astro";
+import ConditionalHeader from "../components/ConditionalHeader.astro";
+import HeroSection from "../components/HeroSection.astro";
 import VideoReelFeed from "../components/VideoReelFeed.astro";
 import Layout from "../layouts/Layout.astro";
 import { FeedItemsProviderError, getFeedItemsProvider } from "../data/feed-items";
@@ -49,18 +52,21 @@ async function loadFeedPageState(): Promise<FeedPageState> {
 
 <Layout
   title="VixenBliss Agency"
-  description="Mobile-first vertical video feed powered by Directus and Bunny Stream."
+  description="Plataforma creativa de experiencias visuales impulsadas por IA."
 >
   <main class="page-shell">
+    <ConditionalHeader />
+    <HeroSection />
+    <AboutSection />
     {
       state.status === "ready" ? (
-        <>
+        <section id="feed" class="feed-section" aria-label="Video feed">
           <div class="sr-only" aria-live="polite">
             Showing {state.items.length} published Directus feed items. Bunny embeds are{" "}
             {bunnyLibraryReady ? "enabled" : "in fallback mode"}.
           </div>
           <VideoReelFeed items={state.items} />
-        </>
+        </section>
       ) : (
         <section class:list={["feed-state", state.status === "error" && "feed-state--error"]} aria-live="polite">
           <p class="feed-state__eyebrow">VixenBliss Agency</p>
@@ -87,10 +93,22 @@ async function loadFeedPageState(): Promise<FeedPageState> {
 </Layout>
 
 <style>
+  :global(html) {
+    scroll-snap-type: y mandatory;
+  }
+
   .page-shell {
     min-height: 100vh;
     min-height: 100svh;
+    overflow-x: hidden;
     background: #050507;
+  }
+
+  .feed-section {
+    min-height: 100vh;
+    min-height: 100svh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
   }
 
   .sr-only {
@@ -109,6 +127,8 @@ async function loadFeedPageState(): Promise<FeedPageState> {
     gap: 1rem;
     min-height: 100vh;
     min-height: 100svh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
     padding: 1.2rem;
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent),

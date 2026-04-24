@@ -19,26 +19,18 @@ const links = [
 
 <style>
   .site-footer {
-    position: fixed;
-    top: max(0.55rem, env(safe-area-inset-top));
-    right: 0.65rem;
-    left: 0.65rem;
-    z-index: 20;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
     gap: 0.45rem 0.75rem;
-    max-width: 52rem;
-    margin: 0 auto;
-    padding: 0.42rem 0.58rem;
-    border: 1px solid rgba(255, 255, 255, 0.11);
-    border-radius: 0.5rem;
-    background: rgba(7, 7, 10, 0.62);
-    color: rgba(255, 255, 255, 0.72);
+    min-height: 3.5rem;
+    padding: 0.72rem 1rem max(0.72rem, env(safe-area-inset-bottom));
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: #050507;
+    color: rgba(255, 255, 255, 0.58);
     font-size: 0.72rem;
     line-height: 1.2;
-    backdrop-filter: blur(14px);
   }
 
   .site-footer__nav {
@@ -65,10 +57,7 @@ const links = [
 
   @media (min-width: 768px) {
     .site-footer {
-      right: 1rem;
-      left: 1rem;
-      width: fit-content;
-      padding: 0.46rem 0.7rem;
+      padding: 0.8rem 1.25rem;
       font-size: 0.75rem;
     }
   }

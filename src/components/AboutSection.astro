@@ -1,0 +1,79 @@
+<section id="about" class="about-section" aria-labelledby="about-title">
+  <div class="about-section__inner">
+    <p class="about-section__eyebrow">Plataforma creativa</p>
+    <h2 id="about-title">Contenido visual con inteligencia artificial</h2>
+    <div class="about-section__copy">
+      <p>
+        VixenBliss Agency es una plataforma creativa enfocada en contenido visual generado
+        con inteligencia artificial.
+      </p>
+      <p>
+        Combinamos diseño, movimiento y tecnología para crear experiencias visuales modernas,
+        dinámicas y atractivas.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-section {
+    display: grid;
+    min-height: 100vh;
+    min-height: 100svh;
+    place-items: center;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    padding: 4rem 1.15rem;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 34%),
+      #050507;
+  }
+
+  .about-section__inner {
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+    width: min(100%, 46rem);
+    text-align: center;
+  }
+
+  .about-section__eyebrow,
+  h2,
+  p {
+    margin: 0;
+  }
+
+  .about-section__eyebrow {
+    color: rgba(255, 123, 157, 0.88);
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  h2 {
+    max-width: 15ch;
+    color: #fff;
+    font-size: clamp(2.25rem, 10vw, 5rem);
+    font-weight: 820;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+
+  .about-section__copy {
+    display: grid;
+    gap: 0.85rem;
+    max-width: 38rem;
+    color: rgba(255, 255, 255, 0.74);
+    font-size: clamp(1rem, 3.6vw, 1.18rem);
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
+  @media (min-width: 768px) {
+    .about-section {
+      padding: 5rem 2rem;
+    }
+  }
+</style>
