@@ -53,3 +53,22 @@ test("conditional header hides after the first viewport", () => {
   assert.match(header, /Contacto/);
   assert.match(header, /Legal/);
 });
+
+test("homepage owns one global reels scroll snap container", () => {
+  const homepage = readProjectFile("src/pages/index.astro");
+  const hero = readProjectFile("src/components/HeroSection.astro");
+  const about = readProjectFile("src/components/AboutSection.astro");
+  const feed = readProjectFile("src/components/VideoReelFeed.astro");
+  const item = readProjectFile("src/components/VideoReelItem.astro");
+  const media = readProjectFile("src/components/VideoMedia.astro");
+
+  assert.match(homepage, /<main class="page-shell" data-reel-scroll-container>/);
+  assert.match(homepage, /\.page-shell\s*{[\s\S]*height: 100vh;[\s\S]*overflow-y: auto;[\s\S]*scroll-snap-type: y mandatory;/);
+  assert.match(hero, /\.hero-section\s*{[\s\S]*height: 100vh;[\s\S]*scroll-snap-align: start;/);
+  assert.match(about, /\.about-section\s*{[\s\S]*height: 100vh;[\s\S]*scroll-snap-align: start;/);
+  assert.match(item, /\.reel-item\s*{[\s\S]*height: 100vh;[\s\S]*scroll-snap-align: start;/);
+  assert.doesNotMatch(feed, /\.reel-feed__scroller\s*{[\s\S]*overflow-y: auto;/);
+  assert.match(feed, /closest<HTMLElement>\("\[data-reel-scroll-container\]"\)/);
+  assert.match(feed, /root: scrollRoot/);
+  assert.match(media, /\.video-media\s*{[\s\S]*pointer-events: none;/);
+});

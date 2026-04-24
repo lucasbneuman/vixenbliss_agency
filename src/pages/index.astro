@@ -54,7 +54,7 @@ async function loadFeedPageState(): Promise<FeedPageState> {
   title="VixenBliss Agency"
   description="Plataforma creativa de experiencias visuales impulsadas por IA."
 >
-  <main class="page-shell">
+  <main class="page-shell" data-reel-scroll-container>
     <ConditionalHeader />
     <HeroSection />
     <AboutSection />
@@ -93,22 +93,30 @@ async function loadFeedPageState(): Promise<FeedPageState> {
 </Layout>
 
 <style>
-  :global(html) {
-    scroll-snap-type: y mandatory;
+  :global(html),
+  :global(body) {
+    height: 100%;
+    overflow: hidden;
   }
 
   .page-shell {
-    min-height: 100vh;
-    min-height: 100svh;
+    height: 100vh;
+    height: 100svh;
     overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
     background: #050507;
   }
 
+  .page-shell::-webkit-scrollbar {
+    display: none;
+  }
+
   .feed-section {
-    min-height: 100vh;
-    min-height: 100svh;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
+    background: #050507;
   }
 
   .sr-only {
@@ -125,8 +133,8 @@ async function loadFeedPageState(): Promise<FeedPageState> {
     display: grid;
     align-content: center;
     gap: 1rem;
-    min-height: 100vh;
-    min-height: 100svh;
+    height: 100vh;
+    height: 100svh;
     scroll-snap-align: start;
     scroll-snap-stop: always;
     padding: 1.2rem;

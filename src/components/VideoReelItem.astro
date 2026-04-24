@@ -58,8 +58,8 @@ const cta = resolveCta(item.cta_url, campaignTag, slug);
 <style>
   .reel-item {
     position: relative;
-    min-height: 100vh;
-    min-height: 100svh;
+    height: 100vh;
+    height: 100svh;
     overflow: hidden;
     scroll-snap-align: start;
     scroll-snap-stop: always;
@@ -137,7 +137,6 @@ const cta = resolveCta(item.cta_url, campaignTag, slug);
 
   @media (min-width: 768px) {
     .reel-item {
-      min-height: min(100vh, 54rem);
       border-right: 1px solid rgba(255, 255, 255, 0.1);
       border-left: 1px solid rgba(255, 255, 255, 0.1);
     }
