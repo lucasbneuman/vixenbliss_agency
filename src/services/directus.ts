@@ -77,9 +77,10 @@ export function mapDirectusFeedItem(record: unknown): FeedItem | null {
   const status = toStringValue(record.status);
   const title = toStringValue(record.title);
   const slug = toStringValue(record.slug);
-  const publishedAt = toStringValue(record.published_at);
+  const publishedAt =
+    toStringValue(record.published_at) || toStringValue(record.created_at) || toStringValue(record.updated_at);
 
-  if (!id || status !== "published" || !title || !slug || !publishedAt) {
+  if (!id || status !== "published" || !title || !slug) {
     return null;
   }
 

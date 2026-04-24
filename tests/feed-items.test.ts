@@ -69,6 +69,31 @@ test("Directus mapper returns a clean FeedItem with safe fallbacks", () => {
   assert.equal(item?.sort_order, 0);
 });
 
+test("Directus mapper keeps published items when published_at is empty", () => {
+  const item = mapDirectusFeedItem({
+    id: 9,
+    status: "published",
+    title: "Uploaded Bunny video",
+    slug: "uploaded-bunny-video",
+    caption_short: "",
+    caption_long: "",
+    thumbnail_url: "",
+    bunny_video_id: "video-9",
+    bunny_embed_url: null,
+    cta_text: "",
+    cta_url: "",
+    sort_order: 100,
+    published_at: null,
+    is_featured: false,
+    campaign_tag: "bunny-sync",
+    created_at: "2026-04-24T12:00:00.000Z",
+    updated_at: null,
+  });
+
+  assert.equal(item?.id, "9");
+  assert.equal(item?.published_at, "2026-04-24T12:00:00.000Z");
+});
+
 test("Directus mapper drops items without minimum renderable structure", () => {
   const item = mapDirectusFeedItem({
     id: 1,
