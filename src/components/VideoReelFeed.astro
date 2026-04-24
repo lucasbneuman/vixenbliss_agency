@@ -1,0 +1,257 @@
+---
+import VideoReelItem from "./VideoReelItem.astro";
+import type { FeedItem } from "../types/feed-item.ts";
+
+interface Props {
+  items: FeedItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<section class="reel-feed" aria-label="VixenBliss video feed">
+  <div class="reel-feed__scroller" data-reel-feed>
+    {items.map((item, index) => <VideoReelItem item={item} index={index} />)}
+  </div>
+</section>
+
+<script>
+  import { trackAnalyticsEvent, type BaseAnalyticsPayload } from "../lib/analytics.ts";
+
+  const feeds = document.querySelectorAll<HTMLElement>("[data-reel-feed]");
+
+  const scrollDepthThresholds = [25, 50, 75, 100];
+
+  function loadIframe(iframe: HTMLIFrameElement) {
+    if (iframe.dataset.loaded === "true") {
+      return;
+    }
+
+    const src = iframe.dataset.src;
+
+    if (!src) {
+      return;
+    }
+
+    iframe.src = src;
+    iframe.dataset.loaded = "true";
+  }
+
+  function unloadIframe(iframe: HTMLIFrameElement) {
+    if (iframe.dataset.loaded !== "true") {
+      return;
+    }
+
+    iframe.removeAttribute("src");
+    iframe.dataset.loaded = "false";
+  }
+
+  function pauseNativeVideos(item: Element) {
+    item.querySelectorAll<HTMLVideoElement>("video").forEach((video) => {
+      video.pause();
+    });
+  }
+
+  function playNativeVideos(item: Element) {
+    item.querySelectorAll<HTMLVideoElement>("video").forEach((video) => {
+      video.muted = true;
+      video.playsInline = true;
+      void video.play().catch(() => undefined);
+    });
+  }
+
+  function getItemPayload(item: HTMLElement): BaseAnalyticsPayload {
+    return {
+      campaign_tag: item.dataset.campaignTag ?? "",
+      feed_item_id: item.dataset.feedItemId ?? "",
+      index: Number(item.dataset.index ?? 0),
+      slug: item.dataset.slug ?? "",
+    };
+  }
+
+  feeds.forEach((feed) => {
+    const items = feed.querySelectorAll<HTMLElement>("[data-reel-item]");
+    const impressedItemIds = new Set<string>();
+    const emittedScrollDepths = new Set<number>();
+    let activeItemId = "";
+    let scrollDepthFrame = 0;
+
+    function trackReelImpression(item: HTMLElement) {
+      const payload = getItemPayload(item);
+
+      if (!payload.feed_item_id || impressedItemIds.has(payload.feed_item_id)) {
+        return;
+      }
+
+      impressedItemIds.add(payload.feed_item_id);
+      trackAnalyticsEvent("reel_impression", payload);
+    }
+
+    function trackReelActive(item: HTMLElement) {
+      const payload = getItemPayload(item);
+
+      if (!payload.feed_item_id || activeItemId === payload.feed_item_id) {
+        return;
+      }
+
+      activeItemId = payload.feed_item_id;
+      trackAnalyticsEvent("reel_active", payload);
+    }
+
+    function trackScrollDepth() {
+      scrollDepthFrame = 0;
+
+      if (feed.scrollHeight <= feed.clientHeight || items.length === 0) {
+        return;
+      }
+
+      const rawDepth = ((feed.scrollTop + feed.clientHeight) / feed.scrollHeight) * 100;
+      const depth = Math.min(100, Math.max(0, Math.round(rawDepth)));
+      const maxIndex = Math.min(items.length - 1, Math.max(0, Math.round(feed.scrollTop / feed.clientHeight)));
+
+      scrollDepthThresholds.forEach((threshold) => {
+        if (depth < threshold || emittedScrollDepths.has(threshold)) {
+          return;
+        }
+
+        emittedScrollDepths.add(threshold);
+        trackAnalyticsEvent("scroll_depth", {
+          depth_percent: threshold,
+          max_index: maxIndex,
+          total_items: items.length,
+        });
+      });
+    }
+
+    feed.addEventListener("click", (event) => {
+      const cta = (event.target as Element | null)?.closest<HTMLElement>("[data-reel-cta]");
+
+      if (!cta || cta.getAttribute("aria-disabled") === "true") {
+        return;
+      }
+
+      trackAnalyticsEvent("cta_click", {
+        campaign_tag: cta.dataset.campaignTag ?? "",
+        cta_url: cta.dataset.ctaUrl ?? "",
+        feed_item_id: cta.dataset.feedItemId ?? "",
+        index: Number(cta.closest<HTMLElement>("[data-reel-item]")?.dataset.index ?? 0),
+        slug: cta.dataset.slug ?? "",
+      });
+    });
+
+    feed.addEventListener(
+      "scroll",
+      () => {
+        if (scrollDepthFrame) {
+          return;
+        }
+
+        scrollDepthFrame = window.requestAnimationFrame(trackScrollDepth);
+      },
+      { passive: true },
+    );
+
+    if (!("IntersectionObserver" in window)) {
+      items.forEach((item) => {
+        item.querySelectorAll<HTMLIFrameElement>("[data-reel-iframe]").forEach(loadIframe);
+        trackReelImpression(item);
+      });
+      trackReelActive(items[0]);
+      trackScrollDepth();
+      return;
+    }
+
+    const preloadObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) {
+            return;
+          }
+
+          entry.target.querySelectorAll<HTMLIFrameElement>("[data-reel-iframe]").forEach(loadIframe);
+          trackReelImpression(entry.target as HTMLElement);
+        });
+      },
+      {
+        root: feed,
+        rootMargin: "85% 0px",
+        threshold: 0,
+      },
+    );
+
+    const activeObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const item = entry.target as HTMLElement;
+          const iframes = item.querySelectorAll<HTMLIFrameElement>("[data-reel-iframe]");
+
+          if (entry.intersectionRatio >= 0.6) {
+            item.setAttribute("aria-current", "true");
+            iframes.forEach(loadIframe);
+            playNativeVideos(item);
+            trackReelImpression(item);
+            trackReelActive(item);
+            return;
+          }
+
+          item.setAttribute("aria-current", "false");
+          pauseNativeVideos(item);
+
+          if (!entry.isIntersecting) {
+            iframes.forEach(unloadIframe);
+          }
+        });
+      },
+      {
+        root: feed,
+        threshold: [0, 0.6],
+      },
+    );
+
+    items.forEach((item) => {
+      preloadObserver.observe(item);
+      activeObserver.observe(item);
+    });
+
+    trackScrollDepth();
+  });
+</script>
+
+<style>
+  .reel-feed {
+    min-height: 100vh;
+    min-height: 100svh;
+    background:
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04), transparent 20%, transparent 80%, rgba(255, 255, 255, 0.04)),
+      #050507;
+  }
+
+  .reel-feed__scroller {
+    width: 100%;
+    height: 100vh;
+    height: 100svh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none;
+    background: #050507;
+  }
+
+  .reel-feed__scroller::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .reel-feed {
+      display: grid;
+      place-items: center;
+      padding: 0;
+    }
+
+    .reel-feed__scroller {
+      width: min(100vw, 30rem);
+      box-shadow: 0 0 80px rgba(0, 0, 0, 0.7);
+    }
+  }
+</style>

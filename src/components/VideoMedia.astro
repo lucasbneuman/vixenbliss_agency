@@ -1,0 +1,68 @@
+---
+import { withBunnyAutoplayParams, type ReelMedia } from "../lib/reel-media.ts";
+
+interface Props {
+  media: ReelMedia;
+  title: string;
+}
+
+const { media, title } = Astro.props;
+---
+
+<div class="video-media">
+  {
+    media.kind === "embed" ? (
+      <iframe
+        class="video-media__frame"
+        data-reel-iframe
+        data-src={withBunnyAutoplayParams(media.src)}
+        title={`${title} video`}
+        loading="lazy"
+        allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+        allowfullscreen
+      />
+    ) : media.kind === "thumbnail" ? (
+      <img class="video-media__image" src={media.src} alt={media.alt} loading="lazy" decoding="async" />
+    ) : (
+      <div class="video-media__placeholder" role="img" aria-label={`${title} video placeholder`}>
+        <span>VixenBliss</span>
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .video-media {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: #050507;
+  }
+
+  .video-media__frame,
+  .video-media__image,
+  .video-media__placeholder {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .video-media__frame,
+  .video-media__image {
+    display: block;
+    object-fit: cover;
+  }
+
+  .video-media__placeholder {
+    display: grid;
+    place-items: center;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0)),
+      radial-gradient(circle at 50% 32%, rgba(255, 95, 135, 0.24), transparent 32%),
+      linear-gradient(160deg, #181820, #08080c 58%, #141018);
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+</style>

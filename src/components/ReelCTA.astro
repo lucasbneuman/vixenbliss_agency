@@ -1,0 +1,84 @@
+---
+interface Props {
+  campaignTag: string;
+  feedItemId: string;
+  href: string;
+  isDisabled: boolean;
+  isExternal: boolean;
+  label: string;
+  slug: string;
+}
+
+const { campaignTag, feedItemId, href, isDisabled, isExternal, label, slug } = Astro.props;
+---
+
+{
+  isDisabled ? (
+    <span
+      class="reel-cta reel-cta--disabled"
+      data-reel-cta
+      data-feed-item-id={feedItemId}
+      data-campaign-tag={campaignTag}
+      data-slug={slug}
+      data-cta-url={href}
+      aria-disabled="true"
+    >
+      {label}
+    </span>
+  ) : (
+    <a
+      class="reel-cta"
+      href={href}
+      target={isExternal ? "_blank" : undefined}
+      rel={isExternal ? "noopener noreferrer" : undefined}
+      aria-label={label}
+      data-reel-cta
+      data-feed-item-id={feedItemId}
+      data-campaign-tag={campaignTag}
+      data-slug={slug}
+      data-cta-url={href}
+    >
+      {label}
+    </a>
+  )
+}
+
+<style>
+  .reel-cta {
+    display: inline-flex;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: center;
+    width: min(100%, 18rem);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 0.7rem;
+    padding: 0.78rem 1.05rem;
+    background: rgba(255, 255, 255, 0.92);
+    color: #08080c;
+    font-size: 0.98rem;
+    font-weight: 800;
+    line-height: 1.15;
+    text-align: center;
+    text-decoration: none;
+    box-shadow: 0 14px 38px rgba(0, 0, 0, 0.34);
+    transition:
+      transform 160ms ease,
+      background 160ms ease;
+  }
+
+  .reel-cta:focus-visible {
+    outline: 3px solid rgba(255, 255, 255, 0.9);
+    outline-offset: 3px;
+  }
+
+  .reel-cta:hover {
+    transform: translateY(-1px);
+    background: #ffffff;
+  }
+
+  .reel-cta--disabled {
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.16);
+    color: rgba(255, 255, 255, 0.62);
+  }
+</style>

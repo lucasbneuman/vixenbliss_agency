@@ -1,0 +1,153 @@
+---
+import ReelCTA from "./ReelCTA.astro";
+import VideoMedia from "./VideoMedia.astro";
+import { resolveCta } from "../lib/conversion.ts";
+import { resolveReelMedia } from "../lib/reel-media.ts";
+import type { FeedItem } from "../types/feed-item.ts";
+
+interface Props {
+  item: FeedItem;
+  index: number;
+}
+
+const { item, index } = Astro.props;
+const media = resolveReelMedia(item);
+const campaignTag = item.campaign_tag.trim();
+const slug = item.slug.trim();
+const cta = resolveCta(item.cta_url, campaignTag, slug);
+---
+
+<article
+  class="reel-item"
+  data-reel-item
+  data-feed-item-id={item.id}
+  data-campaign-tag={campaignTag}
+  data-slug={slug}
+  data-cta-url={cta.href}
+  data-index={index}
+  aria-label={item.title}
+  aria-current={index === 0 ? "true" : "false"}
+>
+  <VideoMedia media={media} title={item.title} />
+
+  <div class="reel-item__shade" aria-hidden="true"></div>
+
+  <div class="reel-item__content">
+    <div class="reel-item__copy">
+      <div class="reel-item__meta" aria-label="Content labels">
+        {item.is_featured ? <span>Featured</span> : null}
+        {campaignTag ? <span>{campaignTag}</span> : null}
+      </div>
+
+      <h2>{item.title}</h2>
+      {item.caption_short ? <p>{item.caption_short}</p> : null}
+    </div>
+
+    <ReelCTA
+      href={cta.href}
+      label={item.cta_text}
+      isDisabled={cta.isDisabled}
+      isExternal={cta.isExternal}
+      feedItemId={item.id}
+      campaignTag={campaignTag}
+      slug={slug}
+    />
+  </div>
+</article>
+
+<style>
+  .reel-item {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100svh;
+    overflow: hidden;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    isolation: isolate;
+    background: #050507;
+  }
+
+  .reel-item__shade {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(180deg, rgba(0, 0, 0, 0.22) 0%, transparent 34%),
+      linear-gradient(0deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.48) 30%, transparent 58%);
+    pointer-events: none;
+  }
+
+  .reel-item__content {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    display: grid;
+    gap: 1.05rem;
+    padding: 1.2rem 1rem max(1.2rem, env(safe-area-inset-bottom));
+  }
+
+  .reel-item__copy {
+    display: grid;
+    gap: 0.48rem;
+    max-width: 34rem;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.65);
+  }
+
+  .reel-item__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    min-height: 1.65rem;
+  }
+
+  .reel-item__meta span {
+    width: fit-content;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    padding: 0.3rem 0.55rem;
+    background: rgba(0, 0, 0, 0.34);
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  h2 {
+    max-width: 15ch;
+    color: #fff;
+    font-size: clamp(2rem, 11vw, 3.5rem);
+    line-height: 0.98;
+  }
+
+  p {
+    max-width: 34ch;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 1rem;
+    line-height: 1.45;
+  }
+
+  @media (min-width: 768px) {
+    .reel-item {
+      min-height: min(100vh, 54rem);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .reel-item__content {
+      padding: 1.35rem;
+    }
+
+    h2 {
+      font-size: clamp(2.2rem, 4.2vw, 3.4rem);
+    }
+  }
+</style>

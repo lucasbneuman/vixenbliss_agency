@@ -1,0 +1,171 @@
+---
+import VideoReelFeed from "../components/VideoReelFeed.astro";
+import Layout from "../layouts/Layout.astro";
+import { FeedItemsProviderError, getFeedItemsProvider } from "../data/feed-items";
+import { env, getContentSource, hasBunnyLibraryId } from "../lib/env";
+import type { FeedItem } from "../types/feed-item";
+
+interface FeedPageState {
+  contentSource: string;
+  errorMessage: string | null;
+  items: FeedItem[];
+  status: "ready" | "empty" | "error";
+}
+
+const state = await loadFeedPageState();
+const bunnyLibraryReady = hasBunnyLibraryId();
+
+async function loadFeedPageState(): Promise<FeedPageState> {
+  let contentSource = env.CONTENT_SOURCE || "directus";
+
+  try {
+    contentSource = getContentSource();
+    const provider = getFeedItemsProvider();
+    const items = await provider.getFeedItems();
+
+    return {
+      contentSource,
+      errorMessage: null,
+      items,
+      status: items.length > 0 ? "ready" : "empty",
+    };
+  } catch (error) {
+    const message =
+      error instanceof FeedItemsProviderError || error instanceof Error
+        ? error.message
+        : "Unknown feed loading error.";
+
+    console.error("[feed] Unable to render Directus feed.", message);
+
+    return {
+      contentSource,
+      errorMessage: message,
+      items: [],
+      status: "error",
+    };
+  }
+}
+---
+
+<Layout
+  title="VixenBliss Agency"
+  description="Mobile-first vertical video feed powered by Directus and Bunny Stream."
+>
+  <main class="page-shell">
+    {
+      state.status === "ready" ? (
+        <>
+          <div class="sr-only" aria-live="polite">
+            Showing {state.items.length} published Directus feed items. Bunny embeds are{" "}
+            {bunnyLibraryReady ? "enabled" : "in fallback mode"}.
+          </div>
+          <VideoReelFeed items={state.items} />
+        </>
+      ) : (
+        <section class:list={["feed-state", state.status === "error" && "feed-state--error"]} aria-live="polite">
+          <p class="feed-state__eyebrow">VixenBliss Agency</p>
+          <h1>{state.status === "empty" ? "No published videos yet." : "The feed is temporarily unavailable."}</h1>
+          <p>
+            {state.status === "empty"
+              ? "Publish records in Directus and refresh the homepage."
+              : "Please refresh in a moment."}
+          </p>
+          <dl>
+            <div>
+              <dt>Source</dt>
+              <dd>{state.contentSource}</dd>
+            </div>
+            <div>
+              <dt>Bunny embeds</dt>
+              <dd>{bunnyLibraryReady ? "enabled" : "fallback mode"}</dd>
+            </div>
+          </dl>
+        </section>
+      )
+    }
+  </main>
+</Layout>
+
+<style>
+  .page-shell {
+    min-height: 100vh;
+    min-height: 100svh;
+    background: #050507;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
+  }
+
+  .feed-state {
+    display: grid;
+    align-content: center;
+    gap: 1rem;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding: 1.2rem;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent),
+      #050507;
+  }
+
+  .feed-state__eyebrow {
+    width: fit-content;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    padding: 0.35rem 0.65rem;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .feed-state h1,
+  .feed-state p,
+  .feed-state dl {
+    margin: 0;
+  }
+
+  .feed-state h1 {
+    max-width: 12ch;
+    color: #fff;
+    font-size: clamp(2.6rem, 12vw, 5rem);
+    line-height: 0.95;
+  }
+
+  .feed-state p {
+    max-width: 36rem;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .feed-state dl {
+    display: grid;
+    gap: 0.55rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .feed-state div {
+    display: flex;
+    gap: 0.55rem;
+  }
+
+  .feed-state dt {
+    color: rgba(255, 255, 255, 0.54);
+    font-weight: 700;
+  }
+
+  .feed-state dd {
+    margin: 0;
+  }
+
+  .feed-state--error {
+    border-top: 4px solid rgba(255, 116, 116, 0.72);
+  }
+</style>
