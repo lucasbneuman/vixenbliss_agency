@@ -1,6 +1,12 @@
 <section id="inicio" class="hero-section" data-hero-section aria-labelledby="hero-title">
   <div class="hero-section__inner">
-    <p class="hero-section__brand">VixenBliss Agency</p>
+    <img
+      class="hero-section__brand"
+      src="/brand/Imagotipo-Vixen-Agency-claro.png"
+      alt="Imagotipo de VixenBliss Agency"
+      width="640"
+      height="344"
+    />
     <h1 id="hero-title">Experiencias visuales impulsadas por IA</h1>
     <p class="hero-section__subtitle">
       Explorá una nueva generación de contenido digital y avatares creativos
@@ -20,7 +26,7 @@
     padding: 6.5rem 1.15rem 3rem;
     background:
       radial-gradient(circle at 50% 26%, rgba(255, 95, 135, 0.16), transparent 34rem),
-      linear-gradient(180deg, #101017 0%, #07070b 58%, #050507 100%);
+      linear-gradient(180deg, #52357b 0%, #1a1229 100%);
   }
 
   .hero-section__inner {
@@ -31,25 +37,21 @@
     text-align: center;
   }
 
-  .hero-section__brand,
   h1,
   .hero-section__subtitle {
     margin: 0;
   }
 
   .hero-section__brand {
-    color: rgba(255, 255, 255, 0.66);
-    font-size: 0.76rem;
-    font-weight: 800;
-    letter-spacing: 0.16em;
-    line-height: 1.2;
-    text-transform: uppercase;
+    width: min(46vw, 10rem);
+    height: auto;
+    object-fit: contain;
   }
 
   h1 {
     max-width: 10ch;
     color: #fff;
-    font-size: clamp(3.1rem, 15vw, 7.2rem);
+    font-size: clamp(2.75rem, 14vw, 7.2rem);
     font-weight: 850;
     line-height: 0.92;
     text-wrap: balance;

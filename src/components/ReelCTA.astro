@@ -63,17 +63,21 @@ const { campaignTag, feedItemId, href, isDisabled, isExternal, label, slug } = A
     box-shadow: 0 14px 38px rgba(0, 0, 0, 0.34);
     transition:
       transform 160ms ease,
-      background 160ms ease;
+      background 160ms ease,
+      color 160ms ease;
   }
 
   .reel-cta:focus-visible {
     outline: 3px solid rgba(255, 255, 255, 0.9);
     outline-offset: 3px;
+    background: #bf092f;
+    color: #ffffff;
   }
 
   .reel-cta:hover {
     transform: translateY(-1px);
-    background: #ffffff;
+    background: #bf092f;
+    color: #ffffff;
   }
 
   .reel-cta--disabled {

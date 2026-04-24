@@ -1,6 +1,11 @@
 <header class="conditional-header" data-conditional-header aria-label="Primary navigation">
   <a class="conditional-header__brand" href="#inicio" aria-label="VixenBliss Agency inicio">
-    VixenBliss
+    <img
+      src="/brand/Imagotipo-Vixen-Agency-claro-horizontal.png"
+      alt="Imagotipo horizontal de VixenBliss Agency"
+      width="1024"
+      height="308"
+    />
   </a>
   <nav class="conditional-header__nav" aria-label="Homepage sections">
     <a href="#inicio">Inicio</a>
@@ -60,11 +65,13 @@
 
   .conditional-header__brand {
     flex: 0 0 auto;
-    font-size: 0.78rem;
-    font-weight: 850;
-    letter-spacing: 0.12em;
     line-height: 1;
-    text-transform: uppercase;
+  }
+
+  .conditional-header__brand img {
+    width: clamp(5.8rem, 18vw, 7rem);
+    height: auto;
+    object-fit: contain;
   }
 
   .conditional-header__nav {
