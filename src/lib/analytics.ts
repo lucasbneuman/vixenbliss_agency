@@ -1,3 +1,5 @@
+import { trackEvent } from "./ga.ts";
+
 export type AnalyticsEventName = "reel_impression" | "reel_active" | "cta_click" | "scroll_depth";
 
 export interface BaseAnalyticsPayload {
@@ -92,4 +94,6 @@ export function trackAnalyticsEvent<Name extends AnalyticsEventName>(
       console.warn("[analytics] Event dropped", error);
     }
   }
+
+  trackEvent(name, payload);
 }

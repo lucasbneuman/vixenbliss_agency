@@ -72,3 +72,13 @@ test("homepage owns one global reels scroll snap container", () => {
   assert.match(feed, /root: scrollRoot/);
   assert.match(media, /\.video-media\s*{[\s\S]*pointer-events: none;/);
 });
+
+test("global layout loads GA4 once with async gtag config", () => {
+  const layout = readProjectFile("src/layouts/Layout.astro");
+
+  assert.equal((layout.match(/googletagmanager\.com\/gtag\/js\?id=G-4DKXZN23P9/g) ?? []).length, 1);
+  assert.match(layout, /<script\s+is:inline\s+async\s+src="https:\/\/www\.googletagmanager\.com\/gtag\/js\?id=G-4DKXZN23P9"><\/script>/);
+  assert.match(layout, /window\.dataLayer = window\.dataLayer \|\| \[\];/);
+  assert.match(layout, /gtag\("config", "G-4DKXZN23P9"\);/);
+  assert.doesNotMatch(layout, /gtag\("event", "page_view"/);
+});

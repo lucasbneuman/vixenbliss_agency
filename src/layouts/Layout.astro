@@ -22,6 +22,17 @@ const {
     <meta name="description" content={description} />
     <meta name="theme-color" content="#08080c" />
     <title>{title}</title>
+    <!-- Google tag (gtag.js) -->
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-4DKXZN23P9"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-4DKXZN23P9");
+    </script>
   </head>
   <body>
     <slot />

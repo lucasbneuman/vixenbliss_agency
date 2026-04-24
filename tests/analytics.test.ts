@@ -7,6 +7,7 @@ import {
   trackAnalyticsEvent,
   type AnalyticsAdapter,
 } from "../src/lib/analytics.ts";
+import { trackEvent, type GtagWindow } from "../src/lib/ga.ts";
 
 test("analytics is enabled unless PUBLIC_ANALYTICS_ENABLED is explicitly false", () => {
   assert.equal(isAnalyticsEnabled(undefined), true);
@@ -77,4 +78,83 @@ test("trackAnalyticsEvent never propagates adapter errors", () => {
       failingAdapter,
     );
   });
+});
+
+test("trackEvent is a no-op when GA is unavailable", () => {
+  const previousWindow = globalThis.window;
+
+  try {
+    delete (globalThis as typeof globalThis & { window?: unknown }).window;
+
+    assert.doesNotThrow(() => {
+      trackEvent("reel_impression", { feed_item_id: "item-1" });
+    });
+  } finally {
+    (globalThis as typeof globalThis & { window?: unknown }).window = previousWindow;
+  }
+});
+
+test("trackEvent sends GA events when gtag exists", () => {
+  const calls: unknown[][] = [];
+  const previousWindow = globalThis.window;
+
+  try {
+    (globalThis as typeof globalThis & { window: GtagWindow }).window = {
+      gtag: (...args: unknown[]) => {
+        calls.push(args);
+      },
+    } as GtagWindow;
+
+    trackEvent("cta_click", { cta_url: "https://example.com" });
+
+    assert.deepEqual(calls, [["event", "cta_click", { cta_url: "https://example.com" }]]);
+  } finally {
+    (globalThis as typeof globalThis & { window?: unknown }).window = previousWindow;
+  }
+});
+
+test("trackAnalyticsEvent forwards existing events to GA once", () => {
+  const calls: unknown[][] = [];
+  const adapterCalls: unknown[] = [];
+  const previousWindow = globalThis.window;
+  const adapter: AnalyticsAdapter = {
+    track(event) {
+      adapterCalls.push(event);
+    },
+  };
+
+  try {
+    (globalThis as typeof globalThis & { window: GtagWindow }).window = {
+      gtag: (...args: unknown[]) => {
+        calls.push(args);
+      },
+    } as GtagWindow;
+
+    trackAnalyticsEvent(
+      "reel_active",
+      {
+        campaign_tag: "spring",
+        feed_item_id: "item-1",
+        index: 0,
+        slug: "intro",
+      },
+      adapter,
+    );
+
+    assert.equal(adapterCalls.length, 1);
+    assert.deepEqual(calls, [
+      [
+        "event",
+        "reel_active",
+        {
+          campaign_tag: "spring",
+          feed_item_id: "item-1",
+          index: 0,
+          slug: "intro",
+        },
+      ],
+    ]);
+  } finally {
+    (globalThis as typeof globalThis & { window?: unknown }).window = previousWindow;
+  }
 });
