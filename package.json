@@ -11,11 +11,15 @@
     "build": "astro build",
     "preview": "astro preview",
     "start": "node ./dist/server/entry.mjs",
+    "sync:bunny": "tsx scripts/sync-bunny-to-directus.ts",
     "test": "node --experimental-strip-types --experimental-specifier-resolution=node --test .\\tests\\*.test.ts",
     "astro": "astro"
   },
   "dependencies": {
     "@astrojs/node": "^10.0.6",
     "astro": "^6.1.9"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0"
   }
 }
